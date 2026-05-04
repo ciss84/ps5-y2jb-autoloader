@@ -185,7 +185,7 @@ function trigger() {
         logWrapper.style.fontFamily = "monospace";
         logWrapper.style.fontSize = "28px";
         logWrapper.style.overflow = "hidden";
-        logWrapper.style.border = "2px solid red";
+        logWrapper.style.border = "2px solid #0070cc";
         logWrapper.style.borderRadius = "8px";
         logWrapper.style.overflowY = "scroll";
         logWrapper.id = "logWrapper";
@@ -202,7 +202,7 @@ function trigger() {
         progressBarContainer.style.width = "60%";
         progressBarContainer.style.height = "100px";
         progressBarContainer.style.backgroundColor = "#202020";
-        progressBarContainer.style.border = "2px solid red";
+        progressBarContainer.style.border = "2px solid #0070cc";
         progressBarContainer.style.borderRadius = "16px";
         progressBarContainer.style.margin = "0 auto";
         progressBarContainer.style.overflow = "hidden";
@@ -227,7 +227,7 @@ function trigger() {
         progressBar.id = "progressBar";
         progressBar.style.width = "100%";
         progressBar.style.height = "100%";
-        progressBar.style.backgroundColor = "#aa0000";
+        progressBar.style.backgroundColor = "#0070cc";
         progressBar.style.transformOrigin = "left";
         progressBar.style.transform = "scaleX(0)";
         progressBar.style.transition = "transform 0.5s ease-in-out";
@@ -1052,7 +1052,7 @@ function trigger() {
             if (typeof text === 'string') {
                 const lowerText = text.toLowerCase();
                 if (lowerText.includes("[error]") || lowerText.includes("[-]") || 
-                    lowerText.includes("error") || lowerText.includes("failed") || 
+                    lowerText.includes("failed") || 
                     lowerText.includes("exception") || lowerText.includes("lapse") || 
                     lowerText.includes("jailbroken") || lowerText.includes("exploit")) {
                     isSystemNotify = true;

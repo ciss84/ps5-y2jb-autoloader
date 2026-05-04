@@ -54,6 +54,7 @@ async function start_icon_update() {
 
       // Write directly from the provided buffer pointer
       const wrote = syscall(SYSCALL.write, fd, buffer_ptr, BigInt(size));
+      syscall(SYSCALL.fsync, fd);
       const closeRet = syscall(SYSCALL.close, fd);
 
       if (wrote < 0n) {
@@ -76,12 +77,22 @@ async function start_icon_update() {
 
   function compare_buffers(buf1_ptr, buf2_ptr, size) {
       const n = BigInt(size);
-      for (let i = 0n; i < n; i++) {
-          if (read8(buf1_ptr + i) !== read8(buf2_ptr + i)) {
-              return false; // Buffers are different
+      // 8-byte stride via read64 (~8x faster on large icon files)
+      const chunks = n >> 3n;
+      for (let i = 0n; i < chunks; i++) {
+          const off = i * 8n;
+          if (read64(buf1_ptr + off) !== read64(buf2_ptr + off)) {
+              return false;
           }
       }
-      return true; // Buffers are identical
+      // Remaining tail bytes
+      const tail = chunks * 8n;
+      for (let i = tail; i < n; i++) {
+          if (read8(buf1_ptr + i) !== read8(buf2_ptr + i)) {
+              return false;
+          }
+      }
+      return true;
   }
 
   function file_exists(path) {
