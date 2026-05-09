@@ -286,7 +286,7 @@ function trigger() {
     try {
         if (typeof window.autoloader_ui === 'function') {
             window.autoloader_ui();
-            window.uiLog("Autoloader " + autoloader_version + " success", "");
+            window.uiLog("Autoloader " + autoloader_version + "", "success");
             window.updateProgress(0, "Running userland exploit...");
             window.uiLog("Y2JB Lapse", "success");
 
