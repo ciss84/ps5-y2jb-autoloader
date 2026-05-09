@@ -1,27 +1,46 @@
 
 // Write UTF-8 string to existing buffer
+// Optimized: packs 8 bytes per write64 for full chunks, falls back to write8 for the tail
+// to avoid overwriting adjacent data in the same allocation.
 function write_string(addr, str) {
     const encoder = new TextEncoder();
     const bytes = encoder.encode(str);
-    
-    for (let i = 0; i < bytes.length; i++) {
+    const len = bytes.length;
+    let i = 0;
+    // Full 8-byte chunks — all bytes within [0, len] (string + null terminator)
+    for (; i + 8 <= len + 1; i += 8) {
+        let val = 0n;
+        for (let j = 0; j < 8; j++) {
+            val |= BigInt(i + j < len ? bytes[i + j] : 0) << BigInt(j * 8);
+        }
+        write64(addr + BigInt(i), val);
+    }
+    // Remaining bytes (< 8) — write8 to avoid stomping adjacent data
+    for (; i < len; i++) {
         write8(addr + BigInt(i), bytes[i]);
     }
-    
-    write8(addr + BigInt(bytes.length), 0);
+    write8(addr + BigInt(len), 0); // null terminator
 }
 
 function alloc_string(str) {
     const encoder = new TextEncoder();
     const bytes = encoder.encode(str);
-    const addr = malloc(bytes.length + 1);
-    
-    for (let i = 0; i < bytes.length; i++) {
+    const len = bytes.length;
+    const addr = malloc(BigInt(len + 1)); // BigInt for consistency with other malloc calls
+    // Fresh allocation — safe to pack null terminator into the last write64 chunk
+    let i = 0;
+    for (; i + 8 <= len + 1; i += 8) {
+        let val = 0n;
+        for (let j = 0; j < 8; j++) {
+            val |= BigInt(i + j < len ? bytes[i + j] : 0) << BigInt(j * 8);
+        }
+        write64(addr + BigInt(i), val);
+    }
+    // Remaining tail (< 8 bytes) — write8 for safety
+    for (; i < len; i++) {
         write8(addr + BigInt(i), bytes[i]);
     }
-    
-    write8(addr + BigInt(bytes.length), 0);
-    
+    if (i <= len) write8(addr + BigInt(len), 0); // null terminator if not already packed
     return addr;
 }
 
@@ -148,16 +167,37 @@ function create_pipe() {
     return [read_fd, write_fd];
 }
 
+// Optimized: one read64 per 8 bytes instead of one read8 per byte (~8x fewer ROP calls)
 function read_buffer(addr, len) {
-    const buffer = new Uint8Array(Number(len));
-    for (let i = 0; i < len; i++) {
+    len = Number(len);
+    const buffer = new Uint8Array(len);
+    let i = 0;
+    for (; i + 8 <= len; i += 8) {
+        const qword = read64(addr + BigInt(i));
+        for (let j = 0; j < 8; j++) {
+            buffer[i + j] = Number((qword >> BigInt(j * 8)) & 0xFFn);
+        }
+    }
+    for (; i < len; i++) {
         buffer[i] = Number(read8(addr + BigInt(i)));
     }
     return buffer;
 }
 
+// Optimized: one write64 per 8 bytes instead of one write8 per byte (~8x fewer ROP calls).
+// NOTE: for non-fresh buffers (addr inside a larger allocation), write64 on the last
+// partial chunk could overwrite adjacent bytes with zeros — hence write8 fallback for tail.
 function write_buffer(addr, buffer) {
-    for (let i = 0; i < buffer.length; i++) {
+    const len = buffer.length;
+    let i = 0;
+    for (; i + 8 <= len; i += 8) {
+        let val = 0n;
+        for (let j = 0; j < 8; j++) {
+            val |= BigInt(buffer[i + j]) << BigInt(j * 8);
+        }
+        write64(addr + BigInt(i), val);
+    }
+    for (; i < len; i++) {
         write8(addr + BigInt(i), buffer[i]);
     }
 }
@@ -513,12 +553,10 @@ async function kill_youtube(delay_ms = 5000) {
 
 async function send_network(ip_address, port, sock_type, buffer) {
     const sockaddr_in = malloc(16);
-    const buf_ptr = malloc(buffer.length);
+    const buf_ptr = malloc(BigInt(buffer.length));
     
-    // Copy buffer to memory
-    for (let i = 0; i < buffer.length; i++) {
-        write8(buf_ptr + BigInt(i), buffer[i]);
-    }
+    // Copy buffer to memory (uses optimized write_buffer: write64 in 8-byte chunks)
+    write_buffer(buf_ptr, buffer);
     
     // Create socket (SOCK_STREAM or SOCK_DGRAM)
     const sock_fd = syscall(SYSCALL.socket, AF_INET, sock_type, 0n);

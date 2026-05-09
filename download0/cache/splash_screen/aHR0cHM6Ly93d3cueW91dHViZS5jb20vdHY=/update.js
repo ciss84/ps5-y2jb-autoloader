@@ -42,6 +42,9 @@ async function start_update() {
       // handle absolute paths: first element will be empty string
       let cur = parts[0] === "" ? "" : parts[0];
 
+      // Allocate stat_buf once outside the loop — reused for every segment
+      const stat_buf = malloc(0x200n);
+
       for (let i = (parts[0] === "" ? 1 : 0); i < parts.length; i++) {
           if (!parts[i]) continue;
           cur = (cur === "") ? ("/" + parts[i]) : (cur + "/" + parts[i]);
@@ -52,7 +55,6 @@ async function start_update() {
           try {
               // check if exists (stat)
               const addr = alloc_string(cur);
-              const stat_buf = malloc(0x200n);
               const st = syscall(SYSCALL.stat, addr, stat_buf);
               if (st === 0n) {
                   createdDirs.add(cur);
@@ -65,9 +67,8 @@ async function start_update() {
                   createdDirs.add(cur);
                   log("mkdir created: " + cur);
               } else {
-                  // if ret < 0, possible errno (e.g. EEXIST) — check stat again
-                  const stat_buf2 = malloc(0x200n);
-                  const st2 = syscall(SYSCALL.stat, addr, stat_buf2);
+                  // if ret < 0, possible errno (e.g. EEXIST) — reuse stat_buf to recheck
+                  const st2 = syscall(SYSCALL.stat, addr, stat_buf);
                   if (st2 === 0n) {
                       createdDirs.add(cur);
                   } else {
@@ -309,10 +310,10 @@ async function start_update() {
     }
     const file_size = Number(read64(stat_buf + 72n));
 
-    if (file_size < 0n) {
+    if (file_size < 0) {
       throw new Error("read_file_to_buffer: invalid file size " + file_size);
     }
-    if (file_size === 0n) { // empty file
+    if (file_size === 0) { // empty file
         return { buffer: malloc(0n), size: 0 };
     }
 
@@ -322,17 +323,23 @@ async function start_update() {
     }
 
     const file_buffer = malloc(BigInt(file_size));
+    // Use a loop: a single read() syscall may return less than requested,
+    // especially for large files (etaHEN ~4.6MB, pldmgr ~2MB).
+    const CHUNK = 0x40000n; // 256KB per read
     let total_bytes_read = 0n;
 
     try {
-      const bytes_read = syscall(SYSCALL.read, fd, file_buffer, BigInt(file_size));
-      total_bytes_read = bytes_read;
-
-      if (bytes_read < 0n) {
-        throw new Error("read_file_to_buffer: read failed: " + toHex(bytes_read));
-      }
-      if (Number(bytes_read) !== file_size) {
-        throw new Error(`read_file_to_buffer: incomplete read. Expected ${file_size}, got ${bytes_read}`);
+      while (total_bytes_read < BigInt(file_size)) {
+        const remaining = BigInt(file_size) - total_bytes_read;
+        const to_read = remaining < CHUNK ? remaining : CHUNK;
+        const bytes_read = syscall(SYSCALL.read, fd, file_buffer + total_bytes_read, to_read);
+        if (bytes_read < 0n) {
+          throw new Error("read_file_to_buffer: read failed at offset " + toHex(total_bytes_read) + ": " + toHex(bytes_read));
+        }
+        if (bytes_read === 0n) {
+          throw new Error("read_file_to_buffer: unexpected EOF after " + total_bytes_read + " of " + file_size + " bytes for " + path);
+        }
+        total_bytes_read += bytes_read;
       }
     } finally {
       syscall(SYSCALL.close, fd);
