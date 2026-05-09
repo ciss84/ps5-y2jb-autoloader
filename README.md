@@ -92,7 +92,7 @@ Since version **v0.5**, the autoloader includes **Payload Manager**. Using it is
 ## Credits
 
 * **[Gezine](https://github.com/Gezine)** - creator of the original [Y2JB](https://github.com/Gezine/Y2JB)
-* **[itsPLK](https://github.com/itsPLK)** - creator [Y2JB autoloader](https://github.com/itsPLK/ps5-y2jb-autoloader)
+* **[itsPLK](https://github.com/itsPLK)** - creator of [Y2JB Autoloader](https://github.com/itsPLK/ps5-y2jb-autoloader)
 * **[shahrilnet](https://github.com/shahrilnet), [null_ptr](https://github.com/n0llptr)** - Referenced many codes from [Remote Lua Loader](https://github.com/shahrilnet/remote_lua_loader)
 * **[BenNoxXD](https://github.com/BenNoxXD)** - [ClosePlayer](https://github.com/BenNoxXD/PS5-BDJ-HEN-loader) reference
 * **[ntfargo](https://github.com/ntfargo)** - Thanks for providing V8 CVEs and CTF writeups
