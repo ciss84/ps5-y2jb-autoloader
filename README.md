@@ -2,7 +2,7 @@
  <img src="./download0/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/icon0.png" width="128" />
 </p>
 <h1 align="center">PS5 Y2JB Autoloader</h1>
-<h3 align="center">Fork of <a href="https://github.com/Gezine/Y2JB">Y2JB</a></h3>
+<h3 align="center">Fork of <a href="https://github.com/itsPLK/ps5-y2jb-autoloader">Y2JB-autoloader</a></h3>
 &nbsp;
 <p align="center">Automatically loads the kernel exploit, elf_loader, your elf payloads, and .js scripts.<br>Supports PS5 firmwares 4.03-10.01</p>
 
@@ -14,6 +14,7 @@
 
 <p align="center">
  <img src="./y2jb_screenshot.png" width="600" />
+https://youtu.be/mSFHoyE1NeM?si=86n8tKanhH_JOLJ1
 </p>
 
 
@@ -92,6 +93,7 @@ Since version **v0.5**, the autoloader includes **Payload Manager**. Using it is
 ## Credits
 
 * **[Gezine](https://github.com/Gezine)** - creator of the original [Y2JB](https://github.com/Gezine/Y2JB)
+* **[itsPLK](https://github.com/itsPLK)** - creator of [Y2JB Autoloader](https://github.com/itsPLK/ps5-y2jb-autoloader)
 * **[shahrilnet](https://github.com/shahrilnet), [null_ptr](https://github.com/n0llptr)** - Referenced many codes from [Remote Lua Loader](https://github.com/shahrilnet/remote_lua_loader)
 * **[BenNoxXD](https://github.com/BenNoxXD)** - [ClosePlayer](https://github.com/BenNoxXD/PS5-BDJ-HEN-loader) reference
 * **[ntfargo](https://github.com/ntfargo)** - Thanks for providing V8 CVEs and CTF writeups
