@@ -5,9 +5,9 @@
     of the MIT license.  See the LICENSE file for details.
 */
 
-const version_string = "Y2JB By Gezine (Fix 1.4 By Ciss84)";
+const version_string = "Y2JB 1.3 by Gezine";
 
-const autoloader_version = "v0.6";
+const autoloader_version = "v0.5";
 
 
 
@@ -155,14 +155,14 @@ function trigger() {
         autoloader_ui.style.transform = "scale(" + scale + ")";
         autoloader_ui.style.transformOrigin = "top left";
         autoloader_ui.style.zIndex = "9999";
-        autoloader_ui.style.backgroundColor = "#01081f";
+        autoloader_ui.style.backgroundColor = "#272727";
         autoloader_ui.style.border = "1px solid black";
         autoloader_ui.style.padding = "5px";
         autoloader_ui.style.fontFamily = "Arial, sans-serif";
         autoloader_ui.style.fontSize = "8px";
 
         const title = document.createElement("div");
-        title.textContent = "Y2JB Lapse 1.2 Autoloader";
+        title.textContent = "Y2JB Autoloader";
         title.style.fontFamily = "monospace";
         title.style.textAlign = "center";
         title.style.fontWeight = "bold";
@@ -185,7 +185,7 @@ function trigger() {
         logWrapper.style.fontFamily = "monospace";
         logWrapper.style.fontSize = "28px";
         logWrapper.style.overflow = "hidden";
-        logWrapper.style.border = "2px solid #0070cc";
+        logWrapper.style.border = "2px solid red";
         logWrapper.style.borderRadius = "8px";
         logWrapper.style.overflowY = "scroll";
         logWrapper.id = "logWrapper";
@@ -202,7 +202,7 @@ function trigger() {
         progressBarContainer.style.width = "60%";
         progressBarContainer.style.height = "100px";
         progressBarContainer.style.backgroundColor = "#202020";
-        progressBarContainer.style.border = "2px solid #0070cc";
+        progressBarContainer.style.border = "2px solid red";
         progressBarContainer.style.borderRadius = "16px";
         progressBarContainer.style.margin = "0 auto";
         progressBarContainer.style.overflow = "hidden";
@@ -227,7 +227,7 @@ function trigger() {
         progressBar.id = "progressBar";
         progressBar.style.width = "100%";
         progressBar.style.height = "100%";
-        progressBar.style.backgroundColor = "#0070cc";
+        progressBar.style.backgroundColor = "#aa0000";
         progressBar.style.transformOrigin = "left";
         progressBar.style.transform = "scaleX(0)";
         progressBar.style.transition = "transform 0.5s ease-in-out";
@@ -286,9 +286,9 @@ function trigger() {
     try {
         if (typeof window.autoloader_ui === 'function') {
             window.autoloader_ui();
-            window.uiLog("Autoloader " + autoloader_version + "", "success");
+            window.uiLog("Autoloader " + autoloader_version + " by PLK", "success");
             window.updateProgress(0, "Running userland exploit...");
-            window.uiLog("Y2JB Lapse", "success");
+            window.uiLog("Y2JB by Gezine", "success");
 
         }
         await log(version_string);
@@ -1052,7 +1052,7 @@ function trigger() {
             if (typeof text === 'string') {
                 const lowerText = text.toLowerCase();
                 if (lowerText.includes("[error]") || lowerText.includes("[-]") || 
-                    lowerText.includes("failed") || 
+                    lowerText.includes("error") || lowerText.includes("failed") || 
                     lowerText.includes("exception") || lowerText.includes("lapse") || 
                     lowerText.includes("jailbroken") || lowerText.includes("exploit")) {
                     isSystemNotify = true;

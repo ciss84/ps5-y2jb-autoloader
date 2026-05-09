@@ -25,21 +25,21 @@
 
 async function start_lapse() {
     try {
-        const lapse_version = "Y2JB By Gezine Lapse 1.2 Fix By Ciss84";
+        const lapse_version = "Y2JB Lapse 1.1 by Gezine";
         
         let failcheck_path;
 
-        const MAIN_CORE = 7;
+        const MAIN_CORE = 4;
         const MAIN_RTPRIO = 0x100;
         const NUM_WORKERS = 2;
         const NUM_GROOMS = 0x200;
         const NUM_HANDLES = 0x100;
-        const NUM_SDS = 100;//64
-        const NUM_SDS_ALT = 100;//48
+        const NUM_SDS = 64;
+        const NUM_SDS_ALT = 48;
         const NUM_RACES = 100;
         const NUM_ALIAS = 100;
         const LEAK_LEN = 16;
-        const NUM_LEAKS = 5;
+        const NUM_LEAKS = 16;
         const NUM_CLOBBERS = 8;
         const MAX_AIO_IDS = 0x80;
 
@@ -164,7 +164,7 @@ async function start_lapse() {
             const rtprio = malloc(0x4);
             write16(rtprio, PRI_REALTIME);
             write16(rtprio + 2n, 0n);
-            syscall(SYSCALL.rtprio_thread, 0n, 0n, rtprio);
+            syscall(SYSCALL.rtprio_thread, RTP_SET, 0n, rtprio);
             return read16(rtprio + 0x2n);
         }
 
@@ -1282,7 +1282,7 @@ async function start_lapse() {
                 success = false;
             }
             
-            if (err1 !== 0n || err2 !== 0n) {
+            if (err1 !== 0n || err1 !== err2) {
                 await log("ERROR: Bad delete of ID pair");
                 success = false;
             }
@@ -1703,7 +1703,7 @@ async function start_lapse() {
                     groom_ids = null;
                 }
 
-                if (block_id !== -1n) {
+                if (block_id !== 0xffffffffffffffffn) {
                     const block_id_buf = malloc(4);
                     write32(block_id_buf, block_id);
                     const block_errors = malloc(4);
@@ -1726,7 +1726,6 @@ async function start_lapse() {
                     for (let i = 0; i < sds_alt.length; i++) {
                         if (sds_alt[i] !== 0xffffffffffffffffn) {
                             syscall(SYSCALL.close, sds_alt[i]);
-                            sds_alt[i] = -1n;
                         }
                     }
                     sds_alt = null;
@@ -1802,12 +1801,12 @@ async function start_lapse() {
         await log("Detected firmware : " + FW_VERSION);
         
         if (compare_version(FW_VERSION, "10.01") > 0) {
-            await log("Not supported firmware\nAborting...");
-            send_notification("Not supported firmware\nAborting...");
+            await log("Not suppoerted firmware\nAborting...");
+            send_notification("Not suppoerted firmware\nAborting...");
             return;
         }
         
-        const kernel_offset = get_kernel_offset()
+        kernel_offset = get_kernel_offset()
         
         await log("\n=== STAGE 0: Setup ===");
         const setup_success = await setup();

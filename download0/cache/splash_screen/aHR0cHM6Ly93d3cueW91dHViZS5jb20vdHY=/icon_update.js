@@ -54,7 +54,6 @@ async function start_icon_update() {
 
       // Write directly from the provided buffer pointer
       const wrote = syscall(SYSCALL.write, fd, buffer_ptr, BigInt(size));
-      syscall(SYSCALL.fsync, fd);
       const closeRet = syscall(SYSCALL.close, fd);
 
       if (wrote < 0n) {
@@ -77,22 +76,12 @@ async function start_icon_update() {
 
   function compare_buffers(buf1_ptr, buf2_ptr, size) {
       const n = BigInt(size);
-      // 8-byte stride via read64 (~8x faster on large icon files)
-      const chunks = n >> 3n;
-      for (let i = 0n; i < chunks; i++) {
-          const off = i * 8n;
-          if (read64(buf1_ptr + off) !== read64(buf2_ptr + off)) {
-              return false;
-          }
-      }
-      // Remaining tail bytes
-      const tail = chunks * 8n;
-      for (let i = tail; i < n; i++) {
+      for (let i = 0n; i < n; i++) {
           if (read8(buf1_ptr + i) !== read8(buf2_ptr + i)) {
-              return false;
+              return false; // Buffers are different
           }
       }
-      return true;
+      return true; // Buffers are identical
   }
 
   function file_exists(path) {
@@ -152,56 +141,6 @@ async function start_icon_update() {
     }
   }
 
-  async function updatePic() {
-    const iconPath = "/user/appmeta/" + get_title_id() + "/pic0.png";
-    const newIconPath = "/mnt/sandbox/" + get_title_id() + "_000/download0/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/pic0.png";
-
-    if (!file_exists(iconPath)) {
-        log("Pic file does not exist: " + iconPath);
-        return null;
-    }
-
-    let currentIcon = null;
-    let newIcon = null;
-    let areIdentical = false;
-
-    try {
-        log("Reading current pic from: " + iconPath);
-        currentIcon = read_file_to_buffer(iconPath);
-        log("Current pic size: " + currentIcon.size + " bytes");
-
-        log("Reading new pic from: " + newIconPath);
-        newIcon = read_file_to_buffer(newIconPath);
-        log("New pic size: " + newIcon.size + " bytes");
-
-        if (currentIcon.size !== newIcon.size) {
-            log("Pics are different (size mismatch).");
-            areIdentical = false;
-        } else {
-            log("Pics are the same size. Comparing contents...");
-            areIdentical = compare_buffers(currentIcon.buffer, newIcon.buffer, currentIcon.size);
-        }
-
-        if (!areIdentical) {
-            log("Pics are different. Updating pic...");
-            const writeSuccess = write_buffer_to_file(iconPath, newIcon.buffer, newIcon.size);
-            if (writeSuccess) {
-                log("Pic updated successfully at: " + iconPath);
-                send_notification("Pic updated successfully.");
-            } else {
-                log("Failed to update pic at: " + iconPath);
-            }
-        } else {
-            log("Pics are identical. No update needed.");
-        }
-
-    } catch (e) {
-        const msg = (e && e.message) ? e.message : String(e);
-        log("[ERROR] updatePic failed: " + msg);
-        send_notification("[ERROR] updatePic: " + msg);
-    }
-  }
-
   await updateIcon();
-  await updatePic();
+
 }
