@@ -177,22 +177,6 @@ const offset_12_xx = {
     PMAP_STORE_DMPDPI: null,
 };
 
-const offset_13_xx = {
-    DATA_BASE: 0xCC0000n,
-    DATA_SIZE: null,
-    DATA_BASE_DYNAMIC: 0x10000n,
-    DATA_BASE_TO_DYNAMIC: null,
-    DATA_BASE_ALLPROC: 0x28C5E00n,
-    DATA_BASE_SECURITY_FLAGS: 0xD99064n,
-    DATA_BASE_ROOTVNODE: 0x3133510n,
-    DATA_BASE_KERNEL_PMAP_STORE: 0x2E74FF8n,
-    DATA_BASE_DATA_CAVE: null,
-    DATA_BASE_GVMSPACE: 0x2ED6570n,
-    PMAP_STORE_PML4PML4I: null,
-    PMAP_STORE_DMPML4I: null,
-    PMAP_STORE_DMPDPI: null,
-};
-
 const ps5_kernel_offset_list = {
     "4.00": offset_4_00_to_4_51,
     "4.02": offset_4_00_to_4_51,
