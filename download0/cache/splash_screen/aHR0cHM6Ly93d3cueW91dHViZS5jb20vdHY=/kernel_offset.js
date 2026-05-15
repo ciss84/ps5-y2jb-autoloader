@@ -233,8 +233,6 @@ const ps5_kernel_offset_list = {
     "12.00": offset_12_xx,
     "12.20": offset_12_xx,
     "12.50": offset_12_xx,
-    "13.00": offset_13_xx,
-    "13.20": offset_13_xx,
 };
 
 let kernel_offset = null;

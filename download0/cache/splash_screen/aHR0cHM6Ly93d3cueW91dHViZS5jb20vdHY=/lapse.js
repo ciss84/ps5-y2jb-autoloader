@@ -25,7 +25,7 @@
 
 async function start_lapse() {
     try {
-        const lapse_version = "Y2JB By Gezine - Lapse 1.2.1(4.xx to 13.xx)Update By Ciss84";
+        const lapse_version = "Y2JB By Gezine - Lapse 1.2.1(4.xx to 12.xx)Update By Ciss84";
         
         let failcheck_path;
 
@@ -1801,7 +1801,7 @@ async function start_lapse() {
         
         await log("Detected firmware : " + FW_VERSION);
         
-        if (compare_version(FW_VERSION, "13.20") > 0) {
+        if (compare_version(FW_VERSION, "12.40") > 0) {
             await log("Not supported firmware\nAborting...");
             send_notification("Not supported firmware\nAborting...");
             return;
