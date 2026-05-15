@@ -5,7 +5,7 @@
     of the MIT license.  See the LICENSE file for details.
 */
 
-const version_string = "Y2JB By Gezine (Fix 1.4 By Ciss84)";
+const version_string = "Y2JB By Gezine (Update 1.5 By Ciss84)";
 
 const autoloader_version = "v0.6";
 
@@ -286,9 +286,9 @@ function trigger() {
     try {
         if (typeof window.autoloader_ui === 'function') {
             window.autoloader_ui();
-            window.uiLog("Autoloader " + autoloader_version + "", "success");
+            window.uiLog("Autoloader " + autoloader_version + " itsPLK", "success");
             window.updateProgress(0, "Running userland exploit...");
-            window.uiLog("Y2JB Lapse", "success");
+            window.uiLog("Y2JB Lapse Update By Ciss84", "success");
 
         }
         await log(version_string);
